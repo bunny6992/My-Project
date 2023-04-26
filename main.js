@@ -1,5 +1,5 @@
 class User {
-  constructor(firstName, lastName, username, password){
+  constructor(username, password, firstName, lastName){
     this.firstName = firstName;
     this.lastName = lastName;
     this.username= username;
@@ -47,10 +47,10 @@ if (registerForm) {
   function register(event) {
     event.preventDefault();
     let newUser = new User(
-      document.getElementById("fname").value,
-      document.getElementById("lname").value,
       document.getElementById("username").value,
-      document.getElementById("password").value
+      document.getElementById("password").value,
+      document.getElementById("fname").value,
+      document.getElementById("lname").value
     );
     console.log(newUser);
   }
@@ -64,7 +64,6 @@ if (loginForm) {
   function login(event) {
     event.preventDefault();
     let newUser = new User(
-      "", "",
       document.getElementById("username").value,
       document.getElementById("password").value
     );
