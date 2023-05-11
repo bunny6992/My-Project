@@ -1,33 +1,101 @@
-const users = [
-    {
-        userId: 111,
-        userName: "barney",
-        password: "suitup"  
-    },
-    {
-        userId: 122,
-        userName: "sheldon",
-        password: "bazzinga"  
-    },
-    {
-        userId: 133,
-        userName: "joey",
-        password: "howyoudoing"  
-    }
-]
+const con = require("./db_connect");
 
-// functions to complete CRUD operations
-function getAllUsers() {
-    return users;
+async function createTable() {
+  let sql = `CREATE TABLE IF NOT EXISTS users (
+    user_id INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT userPK PRIMARY KEY(user_id)
+  );`
+
+  await con.query(sql);  
 }
 
-function login(user) {
-    let cUser = users.filter(u => u.userName == user.userName);
-    if(!cUser[0]) throw Error("Username does not exist!");
+createTable();
 
+// functions to complete CRUD operations
+async function getAllUsers() {
+    let sql = `SELECT * FROM users;`
+    return await con.query(sql);
+}
+
+async function userExists(username) {
+    let sql = `
+        SELECT * FROM users
+        WHERE username = "${username}"
+    `
+    return await con.query(sql);
+}
+
+async function login(user) {
+    let cUser = await userExists(user.username);
+    if(!cUser[0]) throw Error("Username does not exist!");
     if(cUser[0].password != user.password) throw Error("Password is incorrect!");
 
     return cUser[0];
 }
 
-module.exports = { getAllUsers, login }
+async function register(user) {
+    // check to see if username is already in use
+    let cUser = await userExists(user.username);
+    if(cUser.length>0) throw Error("Username already exists");
+
+    // create new user
+    let sql = `
+        INSERT INTO users(username, password)
+        VALUES ("${user.username}", "${user.password}");
+    `
+    await con.query(sql)
+
+    // get user to send over
+    cUser = await getUser(user)
+    console.log(cUser)
+    return cUser[0];
+}
+
+async function getUser(user) {
+    let sql;
+    if(user.userID) {
+        sql = `
+        SELECT * FROM users
+        WHERE user_id = ${user.userID};
+        `
+    } else {
+        sql = `
+        SELECT * FROM users
+        WHERE username = "${user.username}";
+        `
+    }
+
+    return await con.query(sql);
+}
+
+// edit a username function
+async function editUser(user) {
+    let cUser = await userExists(user.username);
+    if(cUser.length > 0) throw Error("Username in use!!");
+
+    let sql = `
+        UPDATE users 
+        SET username = "${user.userName}"
+        WHERE user_id = ${user.userID};
+    `
+
+    await con.query(sql)
+    cUser = await getUser(user)
+    return cUser[0]
+}
+
+async function deleteUser(user) {
+let sql = `
+    DELETE FROM users
+    WHERE user_id = ${user.userID}
+`
+await con.query(sql);
+}
+
+module.exports = { getAllUsers, login, register, editUser, deleteUser }

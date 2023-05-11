@@ -87,7 +87,16 @@ if (loginForm) {
       document.getElementById("username").value,
       document.getElementById("password").value
     );
-    console.log(newUser);
+    fetchData('/users/login', newUser, "POST")
+    .then(data => {
+      setCurrentUser(data);
+      window.location.href = "bmi.html"
+    })
+    .catch(err => {
+      document.querySelector("#login-form p.error").innerHTML = err.message;
+      document.getElementById("username").value = ""
+      document.getElementById("pswd").value = ""
+    })
   }
 }
 
