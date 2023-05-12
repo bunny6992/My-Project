@@ -11,4 +11,13 @@ router.get('/', async (req, res) => {
   }
 })
 
+.post('/create', async (req, res) => {
+  try {
+    let posts = await Post.createPost(req.body);
+    res.send(posts)
+  } catch(err) {
+    res.status(401).send({message: err.message})
+  }
+})
+
 module.exports = router;

@@ -1,18 +1,18 @@
 // User Class
 class User {
   constructor(username, password, firstName, lastName){
-    this.firstName = firstName;
-    this.lastName = lastName;
+    this.first_name = firstName;
+    this.last_name = lastName;
     this.username= username;
     this.password = password;
   }
 
   getFirstName(){
-    return this.firstName;
+    return this.first_name;
   }
 
   getLastName(){
-    return this.lastName;
+    return this.last_name;
   }
 
   getUsername(){
@@ -24,11 +24,11 @@ class User {
   }
 
   setFirstName(firstName){
-    this.firstName = firstName;
+    this.first_name = firstName;
   }
 
   setLastName(lastname){
-    this.lastName = lastname;
+    this.last_name = lastname;
   }
 
   setUsername(username){
@@ -53,28 +53,70 @@ if (registerForm) {
       document.getElementById("fname").value,
       document.getElementById("lname").value
     );
-    console.log(newUser);
-  }
-
-  // Just for Testing
-  let apiTesting = document.getElementById("apiTesting");
-  apiTesting.addEventListener('click', testMyApi);
-
-  let postApiTesting = document.getElementById("postApiTesting");
-  postApiTesting.addEventListener('click', postApi);
-
-  function testMyApi() {
-    fetch("http://localhost:3000/users/")
-    .then(response => response.json())
-    .then(data => console.log(data))
-  }
-
-  function postApi() {
-    fetch("http://localhost:3000/posts/")
-    .then(response => response.json())
-    .then(data => console.log(data))
+    fetchData('/users/register', newUser, "POST")
+    .then(data => {
+      setCurrentUser(data);
+      window.location.href = "post.html"
+    })
+    .catch(err => {
+      document.querySelector("#registerForm p.error").innerHTML = err.message;
+      document.getElementById("username").value = ""
+      document.getElementById("password").value = ""
+    })
   }
 }
+// Profile Form 
+let profileForm = document.getElementById("profileForm");
+if (profileForm) { 
+  profileForm.addEventListener('submit', updateUser);
+
+  function updateUser(event) {
+    event.preventDefault();
+    let cUser = new User(
+      document.getElementById("username").value,
+      document.getElementById("password").value,
+      document.getElementById("fname").value,
+      document.getElementById("lname").value
+    );
+
+    let sUser = getCurrentUser()
+    cUser.userID = sUser.user_id
+
+    if (document.getElementById("username").value == sUser.username) {
+      cUser.setUsername("");
+    }
+
+    fetchData('/users/edit', cUser, "PUT")
+    .then(data => {
+      setCurrentUser(data);
+      window.location.href = "profile.html"
+    })
+    .catch(err => {
+      document.querySelector("#profileForm p.error").innerHTML = err.message;
+      // document.getElementById("username").value = ""
+      // document.getElementById("password").value = ""
+    })
+  }
+}
+
+  // Just for Testing
+  // let apiTesting = document.getElementById("apiTesting");
+  // apiTesting.addEventListener('click', testMyApi);
+
+  // let postApiTesting = document.getElementById("postApiTesting");
+  // postApiTesting.addEventListener('click', postApi);
+
+  // function testMyApi() {
+  //   fetch("http://localhost:3000/users/")
+  //   .then(response => response.json())
+  //   .then(data => console.log(data))
+  // }
+
+  // function postApi() {
+  //   fetch("http://localhost:3000/posts/")
+  //   .then(response => response.json())
+  //   .then(data => console.log(data))
+  // }
 
 // Login Form 
 let loginForm = document.getElementById("loginForm");
@@ -90,12 +132,12 @@ if (loginForm) {
     fetchData('/users/login', newUser, "POST")
     .then(data => {
       setCurrentUser(data);
-      window.location.href = "bmi.html"
+      window.location.href = "post.html"
     })
     .catch(err => {
-      document.querySelector("#login-form p.error").innerHTML = err.message;
+      document.querySelector("#loginForm p.error").innerHTML = err.message;
       document.getElementById("username").value = ""
-      document.getElementById("pswd").value = ""
+      document.getElementById("password").value = ""
     })
   }
 }
@@ -133,3 +175,50 @@ async function fetchData(route = '', data = {}, methodType) {
     throw await response.json();
   }
 } 
+
+// local storage for user
+function setCurrentUser(user) {
+  localStorage.setItem('user', JSON.stringify(user))
+}
+
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('user'));
+}
+
+function logoutUser() {
+  localStorage.removeItem('user')
+  window.location.href = "login.html"
+}
+
+
+if (getCurrentUser()) {
+  document.getElementById("signUpLink").style.display = "none";
+  document.getElementById("logoutLink").style.display = "inline";
+  document.getElementById("profileLink").style.display = "inline";
+  document.getElementById("logoutLink").style.display = "inline";
+  document.getElementById("postLink").style.display = "inline";
+  if (document.getElementById("profileForm")) {
+    let cUser = getCurrentUser()
+    document.getElementById("username").value = cUser.username
+    document.getElementById("fname").value = cUser.first_name
+    document.getElementById("lname").value = cUser.last_name
+  }
+} else {
+  document.getElementById("signUpLink").style.display = "inline";
+  document.getElementById("loginLink").style.display = "inline";
+  document.getElementById("profileLink").style.display = "none";
+  document.getElementById("logoutLink").style.display = "none";
+  document.getElementById("postLink").style.display = "none";
+}
+
+function deleteMyAccount() {
+  let cUser = getCurrentUser()
+  fetchData('/users/delete', cUser, "DELETE")
+  .then(data => {
+    logoutUser()
+    window.location.href = "register.html"
+  })
+  .catch(err => {
+    document.querySelector("#profileForm p.error").innerHTML = err.message;
+  })
+}

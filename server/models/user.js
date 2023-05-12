@@ -46,8 +46,8 @@ async function register(user) {
 
     // create new user
     let sql = `
-        INSERT INTO users(username, password)
-        VALUES ("${user.username}", "${user.password}");
+        INSERT INTO users(username, password, first_name, last_name)
+        VALUES ("${user.username}", "${user.password}", "${user.first_name}", "${user.last_name}");
     `
     await con.query(sql)
 
@@ -76,14 +76,23 @@ async function getUser(user) {
 
 // edit a username function
 async function editUser(user) {
-    let cUser = await userExists(user.username);
-    if(cUser.length > 0) throw Error("Username in use!!");
+    let sql = "";
+    if (user.username) {
+        let cUser = await userExists(user.username);
+        if(cUser.length > 0) throw Error("Username in use!!");
 
-    let sql = `
-        UPDATE users 
-        SET username = "${user.userName}"
-        WHERE user_id = ${user.userID};
-    `
+        sql = `
+            UPDATE users 
+            SET username = "${user.username}", first_name = "${user.first_name}", last_name = "${user.last_name}"
+            WHERE user_id = ${user.userID};
+        `
+    } else {
+        sql = `
+            UPDATE users 
+            SET first_name = "${user.first_name}", last_name = "${user.last_name}"
+            WHERE user_id = ${user.userID};
+        `
+    }
 
     await con.query(sql)
     cUser = await getUser(user)
@@ -91,11 +100,12 @@ async function editUser(user) {
 }
 
 async function deleteUser(user) {
-let sql = `
-    DELETE FROM users
-    WHERE user_id = ${user.userID}
-`
-await con.query(sql);
+    // return user
+    let sql = `
+        DELETE FROM users
+        WHERE user_id = ${user.user_id}
+    `
+    await con.query(sql);
 }
 
 module.exports = { getAllUsers, login, register, editUser, deleteUser }

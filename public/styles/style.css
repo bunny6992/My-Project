@@ -135,3 +135,16 @@ main {
 .form-row textarea {
     border-radius: 5px;
 }
+
+.error {
+    color: lightcoral;
+    padding: 5px;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+nav ul li {
+    display: none;
+}

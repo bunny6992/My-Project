@@ -12,9 +12,11 @@
         <h1>Login</h1>
         <nav>
             <ul>
-                <li><a href="./register.html">Sign Up</a></li>
-                <li><a href="./login.html">Login</a></li>
-                <li><a href="./post.html">Post</a></li>
+                <li id="profileLink"><a href="./profile.html">My Profile</a></li>
+                <li id="signUpLink"><a href="./register.html">Sign Up</a></li>
+                <li id="loginLink"><a href="./login.html">Login</a></li>
+                <li id="postLink"><a href="./post.html">Post</a></li>
+                <li id="logoutLink"><a onclick="logoutUser()" class="cursor">Logout</a></li>
             </ul>
         </nav>
         <img class="profile-avatar" src="./images/avatar.png" alt="">
@@ -25,13 +27,14 @@
             <h1>Good to have you Back...</h1>
         </div>
         <form id="loginForm" class="form-container">
+            <p class="error"></p>
             <div class="mt-10 form-row">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Username" class="rounded-inputs">
+                <input type="text" id="username" name="username" placeholder="Username" class="rounded-inputs" required>
             </div>
             <div class="mt-10 form-row">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="password" class="rounded-inputs">
+                <input type="password" id="password" name="password" placeholder="password" class="rounded-inputs" required>
             </div>
             <div class="mt-10 submit-button">
                 <input type="submit" value="Login">
