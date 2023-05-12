@@ -76,23 +76,20 @@ async function getUser(user) {
 
 // edit a username function
 async function editUser(user) {
-    let sql = "";
+    let sql = `
+        UPDATE users 
+        SET first_name = "${user.first_name}", last_name = "${user.last_name}"
+    `;
+    
     if (user.username) {
         let cUser = await userExists(user.username);
         if(cUser.length > 0) throw Error("Username in use!!");
 
-        sql = `
-            UPDATE users 
-            SET username = "${user.username}", first_name = "${user.first_name}", last_name = "${user.last_name}"
-            WHERE user_id = ${user.userID};
-        `
-    } else {
-        sql = `
-            UPDATE users 
-            SET first_name = "${user.first_name}", last_name = "${user.last_name}"
-            WHERE user_id = ${user.userID};
-        `
+        sql += `, username = "${user.username}"`
     }
+
+    if (user.password) sql += `, password = "${user.password}"`
+    sql += ` WHERE user_id = ${user.userID};`
 
     await con.query(sql)
     cUser = await getUser(user)
