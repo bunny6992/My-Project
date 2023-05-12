@@ -98,11 +98,16 @@ async function editUser(user) {
 
 async function deleteUser(user) {
     // return user
-    let sql = `
-        DELETE FROM users
-        WHERE user_id = ${user.user_id}
+    let sql = `DELETE FROM posts
+        WHERE user_id = ${user.user_id};
     `
     await con.query(sql);
+    sql = `
+        DELETE FROM users
+        WHERE user_id = ${user.user_id};
+    `
+    await con.query(sql);
+    
 }
 
 module.exports = { getAllUsers, login, register, editUser, deleteUser }
