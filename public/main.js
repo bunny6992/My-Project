@@ -150,7 +150,15 @@ if (postForm) {
   function post(event) {
     event.preventDefault();
     let newPost = document.getElementById("newPost").value
-    console.log(newPost);
+    let cUser = getCurrentUser()
+
+    fetchData('/posts/create', {"user_id": cUser.user_id, "post": newPost}, "POST")
+    .then(data => {
+      window.location.href = "post.html"
+    })
+    .catch(err => {
+      document.querySelector("#postForm p.error").innerHTML = err.message;
+    })
   }
 }
 
@@ -220,5 +228,22 @@ function deleteMyAccount() {
   })
   .catch(err => {
     document.querySelector("#profileForm p.error").innerHTML = err.message;
+  })
+}
+
+let myPostsElement = document.getElementById("myPosts")
+
+if (myPostsElement) {
+  fetchData('/posts/user-posts', getCurrentUser(), "POST")
+  .then(data => {
+    let postsHTML = `<div class="mt-10">`
+      data.forEach(element => {
+        postsHTML += `<p class="posts">${element.post}</p>`
+      });
+      postsHTML += `</div>`
+      myPostsElement.innerHTML = postsHTML
+  })
+  .catch(err => {
+    consolelog(err.message)
   })
 }

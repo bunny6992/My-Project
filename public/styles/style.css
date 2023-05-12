@@ -55,6 +55,17 @@ body {
     box-shadow: 5px 5px 5px rgba(122, 120, 120, 0.6);
 }
 
+.posts {
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 40%;
+    margin: auto;
+    border-radius: 15px;
+    color: whitesmoke;
+    padding: 25px;
+    box-shadow: 5px 5px 5px rgba(122, 120, 120, 0.6);
+    margin-top: 20px;
+}
+
 .form-row {
     display: flex;
     justify-content: center;

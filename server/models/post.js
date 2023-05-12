@@ -62,4 +62,21 @@ async function createPost(post) {
     return await getAllUserPosts(post);
 }
 
-module.exports = { getAllPosts, createPost }
+async function editPost(post) {
+    sql = `
+        UPDATE posts 
+        SET post = "${post.post}"
+        WHERE post_id = ${post.post_id};
+    `
+    await con.query(sql)    
+}
+
+async function deletePost(post) {
+    let sql = `
+        DELETE FROM posts
+        WHERE post_id = ${post.post_id}
+    `
+    await con.query(sql);
+}
+
+module.exports = { getAllPosts, createPost, getAllUserPosts, editPost, deletePost }
